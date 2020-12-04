@@ -2,34 +2,28 @@ use aoc_runner_derive::{aoc, aoc_generator};
 use std::collections::HashMap;
 use regex::Regex;
 
-pub struct Passport {
-    entries: HashMap<String, String>
-}
+type Passport = HashMap<String, String>;
 
 #[aoc_generator(day4)]
 pub fn parse_input(input: &str) -> Vec<Passport> {
     let mut passports = vec![];
 
-    let mut entries = HashMap::new();
+    let mut passport = Passport::new();
 
     for line in input.lines() {
         if !line.is_empty() {
             for entry in line.split(' ') {
                 let s: Vec<&str> = entry.split(':').collect();
-                entries.insert(s[0].to_string(), s[1].to_string());
+                passport.insert(s[0].to_string(), s[1].to_string());
             }
         }
         else {
-            passports.push(Passport {
-                entries
-            });
-            entries = HashMap::new()
+            passports.push(passport);
+            passport = Passport::new()
         }
     }
 
-    passports.push(Passport {
-        entries
-    });
+    passports.push(passport);
 
     return passports
 }
@@ -37,18 +31,18 @@ pub fn parse_input(input: &str) -> Vec<Passport> {
 #[aoc(day4, part1)]
 pub fn part1(passports: &Vec<Passport>) -> usize {
     return passports.iter().filter(|p| {
-        p.entries.keys().count() == 8
-        || (p.entries.keys().count() == 7 && !p.entries.contains_key("cid"))
+        p.keys().count() == 8
+        || (p.keys().count() == 7 && !p.contains_key("cid"))
     }).count()
 }
 
 #[aoc(day4, part2)]
 pub fn part2(passports: &Vec<Passport>) -> usize {
     return passports.iter().filter(|p| {
-        if p.entries.keys().count() == 8
-            || (p.entries.keys().count() == 7 && !p.entries.contains_key("cid")) {
+        if p.keys().count() == 8
+            || (p.keys().count() == 7 && !p.contains_key("cid")) {
 
-            return p.entries.iter().all(|(k,v)| {
+            return p.iter().all(|(k,v)| {
                 return match k.as_str() {
                     "byr" => match_year(v, 1920, 2002),
                     "iyr" => match_year(v, 2010, 2020),
